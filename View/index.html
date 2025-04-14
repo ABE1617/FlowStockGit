@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowStock - Gestion de Stock et Ventes pour PME Algériennes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .app-screen {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border-radius: 30px;
+        }
+        .price-card:hover {
+            transform: scale(1.03);
+        }
+        .price-card.popular {
+            border: 2px solid #4F46E5;
+        }
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        .language-toggle {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        .language-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #4F46E5;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "EN";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: #4F46E5;
+        }
+        input:checked + .slider {
+            background-color: #7C3AED;
+        }
+        input:checked + .slider:before {
+            content: "FR";
+            transform: translateX(30px);
+            color: #7C3AED;
+        }
+        .fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .slide-up {
+            animation: slideUp 0.8s ease-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .rotate {
+            animation: rotate 10s linear infinite;
+        }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .wave {
+            animation: wave 3s ease-in-out infinite;
+        }
+        @keyframes wave {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(5deg); }
+            75% { transform: rotate(-5deg); }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased text-gray-800">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50 animate__animated animate__fadeInDown">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-boxes text-indigo-600 text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-indigo-600" data-en="FlowStock" data-fr="FlowStock">FlowStock</span>
+                    </div>
+                </div>
+                <div class="hidden md:ml-6 md:flex md:items-center md:space-x-8">
+                    <a href="#features" class="text-gray-900 hover:text-indigo-600 px-3 py-2 text-sm font-medium" data-en="Features" data-fr="Fonctionnalités">Features</a>
+                    <a href="#pricing" class="text-gray-900 hover:text-indigo-600 px-3 py-2 text-sm font-medium" data-en="Pricing" data-fr="Tarifs">Pricing</a>
+                    <a href="#contact" class="text-gray-900 hover:text-indigo-600 px-3 py-2 text-sm font-medium" data-en="Contact" data-fr="Contact">Contact</a>
+                    <div class="flex items-center ml-4">
+                        <label class="language-toggle mx-3">
+                            <input type="checkbox" id="languageToggle">
+                            <span class="slider"></span>
+                        </label>
+                        <a href="/register" class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 pulse" data-en="Sign UP" data-fr="Register">signup</a>
+                    </div>
+                    <div class="flex items-center ml-4">
+                        <a href="/login" class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 pulse" data-en="Login" data-fr="Login">Login</a>
+                    </div>
+                </div>
+                <div class="-mr-2 flex items-center md:hidden">
+                    <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none" aria-expanded="false">
+                        <span class="sr-only">Open main menu</span>
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
+            <div class="md:flex items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0 animate__animated animate__fadeInLeft">
+                    <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-6" data-en="Revolutionize Your Business with Smart Stock Management" data-fr="Révolutionnez Votre Entreprise avec une Gestion de Stock Intelligente">Revolutionize Your Business with Smart Stock Management</h1>
+                    <p class="text-xl mb-8 opacity-90" data-en="FlowStock gives you complete control over your inventory and sales with powerful features designed for Algerian SMEs." data-fr="FlowStock vous donne un contrôle total sur votre inventaire et vos ventes avec des fonctionnalités puissantes conçues pour les PME Algériennes.">FlowStock gives you complete control over your inventory and sales with powerful features designed for Algerian SMEs.</p>
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <a href="#" class="bg-white text-indigo-600 px-6 py-3 rounded-lg font-semibold text-center hover:bg-gray-100 transition duration-300 animate__animated animate__pulse animate__infinite animate__slower">
+                            <div class="flex items-center justify-center">
+                                <i class="fab fa-apple mr-2 text-xl"></i>
+                                <div>
+                                    <div class="text-xs" data-en="Download on the" data-fr="Télécharger sur">Download on the</div>
+                                    <div class="text-lg leading-none" data-en="App Store" data-fr="App Store">App Store</div>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="#" class="bg-gray-900 text-white px-6 py-3 rounded-lg font-semibold text-center hover:bg-gray-800 transition duration-300 animate__animated animate__pulse animate__infinite animate__slower animate__delay-1s">
+                            <div class="flex items-center justify-center">
+                                <i class="fab fa-google-play mr-2 text-xl"></i>
+                                <div>
+                                    <div class="text-xs" data-en="Get it on" data-fr="Disponible sur">Get it on</div>
+                                    <div class="text-lg leading-none" data-en="Google Play" data-fr="Google Play">Google Play</div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="md:w-1/2 flex justify-center animate__animated animate__fadeInRight">
+                    <div class="relative">
+                        <img src="https://via.placeholder.com/300x600" alt="App Screenshot" class="app-screen h-96 md:h-auto floating">
+                        <div class="absolute -bottom-6 -left-6 w-32 h-32 bg-yellow-400 rounded-full opacity-20 rotate"></div>
+                        <div class="absolute -top-6 -right-6 w-24 h-24 bg-pink-400 rounded-full opacity-20 rotate" style="animation-direction: reverse;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trusted By Section -->
+    <section class="bg-gray-50 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-gray-500 mb-8" data-en="Trusted by Algerian businesses" data-fr="Fiable par les entreprises Algériennes">Trusted by Algerian businesses</p>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-8 items-center justify-center">
+                <div class="flex justify-center animate__animated animate__fadeIn" style="animation-delay: 0.2s;">
+                    <div class="text-gray-700 font-bold text-xl">Cevital</div>
+                </div>
+                <div class="flex justify-center animate__animated animate__fadeIn" style="animation-delay: 0.4s;">
+                    <div class="text-gray-700 font-bold text-xl">NCA</div>
+                </div>
+                <div class="flex justify-center animate__animated animate__fadeIn" style="animation-delay: 0.6s;">
+                    <div class="text-gray-700 font-bold text-xl">Djezzy</div>
+                </div>
+                <div class="flex justify-center animate__animated animate__fadeIn" style="animation-delay: 0.8s;">
+                    <div class="text-gray-700 font-bold text-xl">Soficom</div>
+                </div>
+                <div class="flex justify-center animate__animated animate__fadeIn" style="animation-delay: 1s;">
+                    <div class="text-gray-700 font-bold text-xl">BIM</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 animate__animated animate__fadeIn" data-en="Powerful Features Designed for Your Business" data-fr="Fonctionnalités Puissantes pour Votre Entreprise">Powerful Features Designed for Your Business</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto animate__animated animate__fadeIn" data-en="Everything you need to manage your inventory and sales efficiently in one powerful application" data-fr="Tout ce dont vous avez besoin pour gérer votre inventaire et vos ventes efficacement dans une seule application">Everything you need to manage your inventory and sales efficiently in one powerful application</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-white rounded-xl p-8 shadow-lg feature-card transition duration-300 animate__animated animate__slideInUp" style="animation-delay: 0.2s;">
+                    <div class="w-14 h-14 bg-blue-100 rounded-lg flex items-center justify-center mb-6 wave">
+                        <i class="fas fa-boxes text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3" data-en="Complete Stock Management" data-fr="Gestion Complète de Stock">Complete Stock Management</h3>
+                    <p class="text-gray-600" data-en="Manage suppliers, promotions, purchase orders, price history, and more with our comprehensive stock management system." data-fr="Gérez les fournisseurs, promotions, commandes d'achat, historique des prix et plus avec notre système complet de gestion de stock.">Manage suppliers, promotions, purchase orders, price history, and more with our comprehensive stock management system.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="bg-white rounded-xl p-8 shadow-lg feature-card transition duration-300 animate__animated animate__slideInUp" style="animation-delay: 0.4s;">
+                    <div class="w-14 h-14 bg-green-100 rounded-lg flex items-center justify-center mb-6 wave">
+                        <i class="fas fa-chart-line text-green-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3" data-en="Advanced Sales Management" data-fr="Gestion Avancée des Ventes">Advanced Sales Management</h3>
+                    <p class="text-gray-600" data-en="Handle returns/exchanges, compare sales points, set employee targets, track history, and identify slow-moving/best-selling products." data-fr="Gérez les retours/échanges, comparez les points de vente, fixez des objectifs aux employés, suivez l'historique et identifiez les produits à rotation lente/les meilleures ventes.">Handle returns/exchanges, compare sales points, set employee targets, track history, and identify slow-moving/best-selling products.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="bg-white rounded-xl p-8 shadow-lg feature-card transition duration-300 animate__animated animate__slideInUp" style="animation-delay: 0.6s;">
+                    <div class="w-14 h-14 bg-purple-100 rounded-lg flex items-center justify-center mb-6 wave">
+                        <i class="fas fa-chart-pie text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3" data-en="Data Visualization" data-fr="Visualisation des Données">Data Visualization</h3>
+                    <p class="text-gray-600" data-en="Clear visualization of sales and stock through interactive charts and statistics for quick, informed decision-making." data-fr="Visualisation claire des ventes et du stock via des graphiques interactifs et des statistiques pour une prise de décision rapide et éclairée.">Clear visualization of sales and stock through interactive charts and statistics for quick, informed decision-making.</p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="bg-white rounded-xl p-8 shadow-lg feature-card transition duration-300 animate__animated animate__slideInUp" style="animation-delay: 0.8s;">
+                    <div class="w-14 h-14 bg-yellow-100 rounded-lg flex items-center justify-center mb-6 wave">
+                        <i class="fas fa-cloud text-yellow-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3" data-en="Automatic Backups" data-fr="Sauvegardes Automatiques">Automatic Backups</h3>
+                    <p class="text-gray-600" data-en="Automatic cloud backups with local storage fallback ensures your data is always safe, even during internet outages." data-fr="Sauvegardes automatiques dans le cloud avec stockage local garantissent que vos données sont toujours sécurisées, même sans internet.">Automatic cloud backups with local storage fallback ensures your data is always safe, even during internet outages.</p>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="bg-white rounded-xl p-8 shadow-lg feature-card transition duration-300 animate__animated animate__slideInUp" style="animation-delay: 1s;">
+                    <div class="w-14 h-14 bg-red-100 rounded-lg flex items-center justify-center mb-6 wave">
+                        <i class="fas fa-bell text-red-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3" data-en="Smart Alerts" data-fr="Alertes Intelligentes">Smart Alerts</h3>
+                    <p class="text-gray-600" data-en="Get notified about low stock levels before it's too late. Customize thresholds for different products." data-fr="Soyez averti des niveaux de stock bas avant qu'il ne soit trop tard. Personnalisez les seuils pour différents produits.">Get notified about low stock levels before it's too late. Customize thresholds for different products.</p>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="bg-white rounded-xl p-8 shadow-lg feature-card transition duration-300 animate__animated animate__slideInUp" style="animation-delay: 1.2s;">
+                    <div class="w-14 h-14 bg-indigo-100 rounded-lg flex items-center justify-center mb-6 wave">
+                        <i class="fas fa-file-alt text-indigo-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3" data-en="Custom Reports" data-fr="Rapports Personnalisés">Custom Reports</h3>
+                    <p class="text-gray-600" data-en="Generate customizable reports on sales and inventory tailored to your specific business needs." data-fr="Générez des rapports personnalisés sur les ventes et l'inventaire adaptés à vos besoins spécifiques.">Generate customizable reports on sales and inventory tailored to your specific business needs.</p>
+                </div>
+            </div>
+
+            <!-- Additional Features Grid -->
+            <div class="mt-16 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="flex items-start animate__animated animate__fadeIn" style="animation-delay: 0.2s;">
+                    <i class="fas fa-users text-indigo-500 mt-1 mr-3"></i>
+                    <div>
+                        <h4 class="font-semibold" data-en="Real-time Collaboration" data-fr="Collaboration en Temps Réel">Real-time Collaboration</h4>
+                        <p class="text-sm text-gray-600" data-en="Multi-user access perfect for large stores" data-fr="Accès multi-utilisateurs idéal pour les grands magasins">Multi-user access perfect for large stores</p>
+                    </div>
+                </div>
+                <div class="flex items-start animate__animated animate__fadeIn" style="animation-delay: 0.4s;">
+                    <i class="fas fa-mobile-alt text-indigo-500 mt-1 mr-3"></i>
+                    <div>
+                        <h4 class="font-semibold" data-en="Full Compatibility" data-fr="Compatibilité Totale">Full Compatibility</h4>
+                        <p class="text-sm text-gray-600" data-en="Works on smartphones, tablets, and PCs" data-fr="Fonctionne sur smartphones, tablettes et PC">Works on smartphones, tablets, and PCs</p>
+                    </div>
+                </div>
+                <div class="flex items-start animate__animated animate__fadeIn" style="animation-delay: 0.6s;">
+                    <i class="fas fa-wifi text-indigo-500 mt-1 mr-3"></i>
+                    <div>
+                        <h4 class="font-semibold" data-en="Offline Functionality" data-fr="Fonctionnalité Hors Ligne">Offline Functionality</h4>
+                        <p class="text-sm text-gray-600" data-en="Keep working without internet" data-fr="Continuez à travailler sans internet">Keep working without internet</p>
+                    </div>
+                </div>
+                <div class="flex items-start animate__animated animate__fadeIn" style="animation-delay: 0.8s;">
+                    <i class="fas fa-sticky-note text-indigo-500 mt-1 mr-3"></i>
+                    <div>
+                        <h4 class="font-semibold" data-en="Custom Notes" data-fr="Notes Personnalisées">Custom Notes</h4>
+                        <p class="text-sm text-gray-600" data-en="Add notes to products for special instructions" data-fr="Ajoutez des notes aux produits pour des instructions spéciales">Add notes to products for special instructions</p>
+                    </div>
+                </div>
+                <div class="flex items-start animate__animated animate__fadeIn" style="animation-delay: 1s;">
+                    <i class="fas fa-headset text-indigo-500 mt-1 mr-3"></i>
+                    <div>
+                        <h4 class="font-semibold" data-en="Built-in Support" data-fr="Support Intégré">Built-in Support</h4>
+                        <p class="text-sm text-gray-600" data-en="Direct access to customer support" data-fr="Accès direct au support client">Direct access to customer support</p>
+                    </div>
+                </div>
+                <div class="flex items-start animate__animated animate__fadeIn" style="animation-delay: 1.2s;">
+                    <i class="fas fa-print text-indigo-500 mt-1 mr-3"></i>
+                    <div>
+                        <h4 class="font-semibold" data-en="Printer Connectivity" data-fr="Connectivité Imprimante">Printer Connectivity</h4>
+                        <p class="text-sm text-gray-600" data-en="Print receipts and labels directly" data-fr="Imprimez des reçus et étiquettes directement">Print receipts and labels directly</p>
+                    </div>
+                </div>
+                <div class="flex items-start animate__animated animate__fadeIn" style="animation-delay: 1.4s;">
+                    <i class="fas fa-qrcode text-indigo-500 mt-1 mr-3"></i>
+                    <div>
+                        <h4 class="font-semibold" data-en="QR/Barcode Scanning" data-fr="Scan QR/Code-barres">QR/Barcode Scanning</h4>
+                        <p class="text-sm text-gray-600" data-en="Scan via device camera" data-fr="Scan via la caméra du dispositif">Scan via device camera</p>
+                    </div>
+                </div>
+                <div class="flex items-start animate__animated animate__fadeIn" style="animation-delay: 1.6s;">
+                    <i class="fas fa-paint-brush text-indigo-500 mt-1 mr-3"></i>
+                    <div>
+                        <h4 class="font-semibold" data-en="Intuitive Interface" data-fr="Interface Intuitive">Intuitive Interface</h4>
+                        <p class="text-sm text-gray-600" data-en="Easy to use with minimal training" data-fr="Facile à utiliser avec un minimum de formation">Easy to use with minimal training</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Features -->
+            <div class="mt-20 bg-indigo-50 rounded-xl p-8 border border-indigo-100 animate__animated animate__fadeIn">
+                <h3 class="text-2xl font-bold mb-6 text-indigo-800" data-en="Coming Soon" data-fr="Bientôt Disponible">Coming Soon</h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="flex items-start">
+                        <i class="fas fa-robot text-indigo-500 mt-1 mr-3"></i>
+                        <div>
+                            <h4 class="font-semibold" data-en="AI Assistant" data-fr="Assistant IA">AI Assistant</h4>
+                            <p class="text-sm text-gray-700" data-en="Personalized tips, strategies, and best practices" data-fr="Conseils personnalisés, stratégies et meilleures pratiques">Personalized tips, strategies, and best practices</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-address-book text-indigo-500 mt-1 mr-3"></i>
+                        <div>
+                            <h4 class="font-semibold" data-en="CRM Module" data-fr="Module CRM">CRM Module</h4>
+                            <p class="text-sm text-gray-700" data-en="Enhanced customer management features" data-fr="Fonctionnalités améliorées de gestion client">Enhanced customer management features</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-fire text-indigo-500 mt-1 mr-3"></i>
+                        <div>
+                            <h4 class="font-semibold" data-en="Best-sellers Page" data-fr="Page Meilleures Ventes">Best-sellers Page</h4>
+                            <p class="text-sm text-gray-700" data-en="Track product trends across all locations" data-fr="Suivez les tendances des produits dans tous les points de vente">Track product trends across all locations</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 animate__animated animate__fadeIn" data-en="Simple, Transparent Pricing" data-fr="Tarification Simple et Transparente">Simple, Transparent Pricing</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto animate__animated animate__fadeIn" data-en="Choose the perfect plan for your business needs" data-fr="Choisissez le plan parfait pour les besoins de votre entreprise">Choose the perfect plan for your business needs</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <!-- Basic Plan -->
+                <div class="bg-white rounded-xl p-8 shadow-lg price-card transition duration-300 animate__animated animate__zoomIn" style="animation-delay: 0.2s;">
+                    <h3 class="text-xl font-bold mb-2" data-en="Starter" data-fr="Débutant">Starter</h3>
+                    <p class="text-gray-600 mb-6" data-en="Perfect for small businesses" data-fr="Parfait pour les petites entreprises">Perfect for small businesses</p>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold">5,000 DA</span>
+                        <span class="text-gray-600" data-en="/month" data-fr="/mois">/month</span>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span data-en="Up to 500 products" data-fr="Jusqu'à 500 produits">Up to 500 products</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span data-en="Basic stock management" data-fr="Gestion de stock de base">Basic stock management</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span data-en="Sales tracking" data-fr="Suivi des ventes">Sales tracking</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span data-en="2 user accounts" data-fr="2 comptes utilisateurs">2 user accounts</span>
+                        </li>
+                        <li class="flex items-center text-gray-400">
+                            <i class="fas fa-times mr-2"></i>
+                            <span data-en="Advanced analytics" data-fr="Analyses avancées">Advanced analytics</span>
+                        </li>
+                        <li class="flex items-center text-gray-400">
+                            <i class="fas fa-times mr-2"></i>
+                            <span data-en="Multi-location support" data-fr="Support multi-locations">Multi-location support</span>
+                        </li>
+                    </ul>
+                    <button class="w-full bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition duration-300" data-en="Get Started" data-fr="Commencer">Get Started</button>
+                </div>
+
+                <!-- Popular Plan -->
+                <div class="bg-white rounded-xl p-8 shadow-xl price-card popular transition duration-300 relative animate__animated animate__zoomIn" style="animation-delay: 0.4s;">
+                    <div class="absolute top-0 right-0 bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg" data-en="POPULAR" data-fr="POPULAIRE">POPULAR</div>
+                    <h3 class="text-xl font-bold mb-2" data-en="Professional" data-fr="Professionnel">Professional</h3>
+                    <p class="text-gray-600 mb-6" data-en="Best for growing businesses" data-fr="Idéal pour les entreprises en croissance">Best for growing businesses</p>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold">12,000 DA</span>
+                        <span class="text-gray-600" data-en="/month" data-fr="/mois">/month</span>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span data-en="Up to 5,000 products" data-fr="Jusqu'à 5,000 produits">Up to 5,000 products</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span data-en="Advanced stock management" data-fr="Gestion de stock avancée">Advanced stock management</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span data-en="Complete sales tracking" data-fr="Suivi complet des ventes">Complete sales tracking</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span data-en="10 user accounts" data-fr="10 comptes utilisateurs">10 user accounts</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span data-en="Advanced analytics" data-fr="Analyses avancées">Advanced analytics</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span data-en="3 locations supported" data-fr="3 locations supportées">3 locations supported</span>
+                        </li>
+                    </ul>
+                    <button class="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition duration-300 pulse" data-en="Get Started" data-fr="Commencer">Get Started</button>
+                </div>
+
+                <!-- Enterprise Plan -->
+                <div class="bg-white rounded-xl p-8 shadow-lg price-card transition duration-300 animate__animated animate__zoomIn" style="animation-delay: 0.6s;">
+                    <h3 class="text-xl font-bold mb-2" data-en="Enterprise" data-fr="Entreprise">Enterprise</h3>
+                    <p class="text-gray-600 mb-6" data-en="For large businesses" data-fr="Pour les grandes entreprises">For large businesses</p>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold">25,000 DA</span>
+                        <span class="text-gray-600" data-en="/month" data-fr="/mois">/month</span>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span data-en="Unlimited products" data-fr="Produits illimités">Unlimited products</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span data-en="Premium stock management" data-fr="Gestion de stock premium">Premium stock management</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span data-en="Complete sales tracking" data-fr="Suivi complet des ventes">Complete sales tracking</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span data-en="Unlimited users" data-fr="Utilisateurs illimités">Unlimited users</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span data-en="Premium analytics" data-fr="Analyses premium">Premium analytics</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span data-en="Unlimited locations" data-fr="Locations illimitées">Unlimited locations</span>
+                        </li>
+                    </ul>
+                    <button class="w-full bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition duration-300" data-en="Get Started" data-fr="Commencer">Get Started</button>
+                </div>
+            </div>
+
+            <div class="mt-12 text-center animate__animated animate__fadeIn">
+                <p class="text-gray-600" data-en="Need a custom solution? " data-fr="Besoin d'une solution personnalisée ? ">Need a custom solution? <a href="#contact" class="text-indigo-600 hover:underline" data-en="Contact our sales team" data-fr="Contactez notre équipe commerciale">Contact our sales team</a></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 animate__animated animate__fadeIn" data-en="What Our Customers Say" data-fr="Ce Que Disent Nos Clients">What Our Customers Say</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto animate__animated animate__fadeIn" data-en="Don't just take our word for it - hear from businesses that use FlowStock" data-fr="Ne nous croyez pas sur parole - écoutez les entreprises qui utilisent FlowStock">Don't just take our word for it - hear from businesses that use FlowStock</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-gray-50 rounded-xl p-8 animate__animated animate__fadeIn" style="animation-delay: 0.2s;">
+                    <div class="flex items-center mb-4">
+                        <div class="flex-shrink-0">
+                            <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/women/32.jpg" alt="">
+                        </div>
+                        <div class="ml-4">
+                            <div class="font-bold">Sarah Benmouhoub</div>
+                            <div class="text-gray-600" data-en="RetailChain, CEO" data-fr="RetailChain, PDG">RetailChain, CEO</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-700" data-en="FlowStock has transformed how we manage inventory across our 12 locations. The real-time collaboration feature is a game-changer for our team." data-fr="FlowStock a transformé notre gestion d'inventaire dans nos 12 magasins. La collaboration en temps réel est révolutionnaire pour notre équipe.">FlowStock has transformed how we manage inventory across our 12 locations. The real-time collaboration feature is a game-changer for our team.</p>
+                    <div class="mt-4 flex text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+
+                <!-- Testimonial 2 -->
+                <div class="bg-gray-50 rounded-xl p-8 animate__animated animate__fadeIn" style="animation-delay: 0.4s;">
+                    <div class="flex items-center mb-4">
+                        <div class="flex-shrink-0">
+                            <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/men/54.jpg" alt="">
+                        </div>
+                        <div class="ml-4">
+                            <div class="font-bold">Mohamed Zerrouki</div>
+                            <div class="text-gray-600" data-en="TechGadgets, Operations Manager" data-fr="TechGadgets, Responsable des Opérations">TechGadgets, Operations Manager</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-700" data-en="The smart alerts for low stock levels have saved us countless times. We no longer run out of popular items unexpectedly." data-fr="Les alertes intelligentes pour les stocks bas nous ont sauvé d'innombrables fois. Nous n'avons plus de ruptures inattendues des articles populaires.">The smart alerts for low stock levels have saved us countless times. We no longer run out of popular items unexpectedly.</p>
+                    <div class="mt-4 flex text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+
+                <!-- Testimonial 3 -->
+                <div class="bg-gray-50 rounded-xl p-8 animate__animated animate__fadeIn" style="animation-delay: 0.6s;">
+                    <div class="flex items-center mb-4">
+                        <div class="flex-shrink-0">
+                            <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/women/68.jpg" alt="">
+                        </div>
+                        <div class="ml-4">
+                            <div class="font-bold">Amina Bouchareb</div>
+                            <div class="text-gray-600" data-en="FashionHub, Store Owner" data-fr="FashionHub, Propriétaire">FashionHub, Store Owner</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-700" data-en="The customizable reports give me exactly the insights I need to make purchasing decisions. Our inventory turnover has improved by 30% since we started using FlowStock." data-fr="Les rapports personnalisés me donnent exactement les informations nécessaires pour mes décisions d'achat. Notre rotation des stocks a augmenté de 30% depuis FlowStock.">The customizable reports give me exactly the insights I need to make purchasing decisions. Our inventory turnover has improved by 30% since we started using FlowStock.</p>
+                    <div class="mt-4 flex text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="gradient-bg text-white py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6 animate__animated animate__fadeIn" data-en="Ready to Transform Your Business?" data-fr="Prêt à Transformer Votre Entreprise ?">Ready to Transform Your Business?</h2>
+            <p class="text-xl mb-8 max-w-3xl mx-auto animate__animated animate__fadeIn" data-en="Join thousands of Algerian businesses that trust FlowStock for their inventory and sales management needs." data-fr="Rejoignez des milliers d'entreprises Algériennes qui font confiance à FlowStock pour leurs besoins en gestion de stock et ventes.">Join thousands of Algerian businesses that trust FlowStock for their inventory and sales management needs.</p>
+            <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                <a href="#" class="bg-white text-indigo-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition duration-300 animate__animated animate__pulse animate__infinite animate__slower" data-en="Start Free Trial" data-fr="Essai Gratuit">Start Free Trial</a>
+                <a href="#contact" class="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-indigo-600 transition duration-300 animate__animated animate__pulse animate__infinite animate__slower animate__delay-1s" data-en="Contact Sales" data-fr="Contact Commercial">Contact Sales</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:grid lg:grid-cols-2 lg:gap-12 items-center">
+                <div class="mb-12 lg:mb-0 animate__animated animate__fadeInLeft">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-6" data-en="Get In Touch" data-fr="Contactez-Nous">Get In Touch</h2>
+                    <p class="text-xl text-gray-600 mb-8" data-en="Have questions about FlowStock? Our team is here to help you find the perfect solution for your business." data-fr="Des questions sur FlowStock ? Notre équipe est là pour vous aider à trouver la solution parfaite pour votre entreprise.">Have questions about FlowStock? Our team is here to help you find the perfect solution for your business.</p>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-start animate__animated animate__fadeIn" style="animation-delay: 0.2s;">
+                            <div class="flex-shrink-0 bg-indigo-100 rounded-lg p-3">
+                                <i class="fas fa-envelope text-indigo-600 text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="font-bold" data-en="Email Us" data-fr="Envoyez-nous un email">Email Us</h4>
+                                <p class="text-gray-600">support@flowstock.dz</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start animate__animated animate__fadeIn" style="animation-delay: 0.4s;">
+                            <div class="flex-shrink-0 bg-indigo-100 rounded-lg p-3">
+                                <i class="fas fa-phone-alt text-indigo-600 text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="font-bold" data-en="Call Us" data-fr="Appelez-nous">Call Us</h4>
+                                <p class="text-gray-600">+213 770 123 456</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start animate__animated animate__fadeIn" style="animation-delay: 0.6s;">
+                            <div class="flex-shrink-0 bg-indigo-100 rounded-lg p-3">
+                                <i class="fas fa-map-marker-alt text-indigo-600 text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="font-bold" data-en="Visit Us" data-fr="Visitez-nous">Visit Us</h4>
+                                <p class="text-gray-600">123 Rue Didouche Mourad<br>Alger, Algérie</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 rounded-xl p-8 shadow-lg animate__animated animate__fadeInRight">
+                    <h3 class="text-2xl font-bold mb-6" data-en="Send Us a Message" data-fr="Envoyez-nous un Message">Send Us a Message</h3>
+                    <form>
+                        <div class="mb-6">
+                            <label for="name" class="block text-gray-700 font-medium mb-2" data-en="Your Name" data-fr="Votre Nom">Your Name</label>
+                            <input type="text" id="name" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="" data-en="John Doe" data-fr="Jean Dupont">
+                        </div>
+                        <div class="mb-6">
+                            <label for="email" class="block text-gray-700 font-medium mb-2" data-en="Email Address" data-fr="Adresse Email">Email Address</label>
+                            <input type="email" id="email" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="you@example.com">
+                        </div>
+                        <div class="mb-6">
+                            <label for="subject" class="block text-gray-700 font-medium mb-2" data-en="Subject" data-fr="Sujet">Subject</label>
+                            <input type="text" id="subject" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="" data-en="How can we help?" data-fr="Comment pouvons-nous vous aider ?">
+                        </div>
+                        <div class="mb-6">
+                            <label for="message" class="block text-gray-700 font-medium mb-2" data-en="Message" data-fr="Message">Message</label>
+                            <textarea id="message" rows="4" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="" data-en="Your message here..." data-fr="Votre message ici..."></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition duration-300" data-en="Send Message" data-fr="Envoyer Message">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 animate__animated animate__fadeIn" data-en="Frequently Asked Questions" data-fr="Questions Fréquemment Posées">Frequently Asked Questions</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto animate__animated animate__fadeIn" data-en="Find answers to common questions about FlowStock" data-fr="Trouvez des réponses aux questions courantes sur FlowStock">Find answers to common questions about FlowStock</p>
+            </div>
+
+            <div class="max-w-3xl mx-auto">
+                <div class="space-y-4">
+                    <!-- FAQ Item 1 -->
+                    <div class="bg-white rounded-xl p-6 shadow animate__animated animate__fadeIn" style="animation-delay: 0.2s;">
+                        <button class="flex items-center justify-between w-full text-left focus:outline-none">
+                            <h3 class="text-lg font-semibold" data-en="Is there a free trial available?" data-fr="Y a-t-il un essai gratuit disponible ?">Is there a free trial available?</h3>
+                            <i class="fas fa-chevron-down text-indigo-500 transition-transform duration-300"></i>
+                        </button>
+                        <div class="mt-4 hidden">
+                            <p class="text-gray-600" data-en="Yes, we offer a 14-day free trial for all our plans. You can test all features without any commitment." data-fr="Oui, nous offrons un essai gratuit de 14 jours pour tous nos plans. Vous pouvez tester toutes les fonctionnalités sans engagement.">Yes, we offer a 14-day free trial for all our plans. You can test all features without any commitment.</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 2 -->
+                    <div class="bg-white rounded-xl p-6 shadow animate__animated animate__fadeIn" style="animation-delay: 0.4s;">
+                        <button class="flex items-center justify-between w-full text-left focus:outline-none">
+                            <h3 class="text-lg font-semibold" data-en="Can I use FlowStock offline?" data-fr="Puis-je utiliser FlowStock hors ligne ?">Can I use FlowStock offline?</h3>
+                            <i class="fas fa-chevron-down text-indigo-500 transition-transform duration-300"></i>
+                        </button>
+                        <div class="mt-4 hidden">
+                            <p class="text-gray-600" data-en="Absolutely! FlowStock works offline and will sync your data automatically when you're back online." data-fr="Absolument ! FlowStock fonctionne hors ligne et synchronisera vos données automatiquement lorsque vous serez de nouveau en ligne.">Absolutely! FlowStock works offline and will sync your data automatically when you're back online.</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 3 -->
+                    <div class="bg-white rounded-xl p-6 shadow animate__animated animate__fadeIn" style="animation-delay: 0.6s;">
+                        <button class="flex items-center justify-between w-full text-left focus:outline-none">
+                            <h3 class="text-lg font-semibold" data-en="How does the multi-user collaboration work?" data-fr="Comment fonctionne la collaboration multi-utilisateurs ?">How does the multi-user collaboration work?</h3>
+                            <i class="fas fa-chevron-down text-indigo-500 transition-transform duration-300"></i>
+                        </button>
+                        <div class="mt-4 hidden">
+                            <p class="text-gray-600" data-en="Multiple users can access and update inventory simultaneously. Changes are reflected in real-time across all devices with appropriate permissions." data-fr="Plusieurs utilisateurs peuvent accéder et mettre à jour l'inventaire simultanément. Les modifications sont reflétées en temps réel sur tous les appareils avec les permissions appropriées.">Multiple users can access and update inventory simultaneously. Changes are reflected in real-time across all devices with appropriate permissions.</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 4 -->
+                    <div class="bg-white rounded-xl p-6 shadow animate__animated animate__fadeIn" style="animation-delay: 0.8s;">
+                        <button class="flex items-center justify-between w-full text-left focus:outline-none">
+                            <h3 class="text-lg font-semibold" data-en="What kind of support do you offer?" data-fr="Quel type de support offrez-vous ?">What kind of support do you offer?</h3>
+                            <i class="fas fa-chevron-down text-indigo-500 transition-transform duration-300"></i>
+                        </button>
+                        <div class="mt-4 hidden">
+                            <p class="text-gray-600" data-en="We provide 24/7 email support for all plans. Phone support is available for Professional and Enterprise plans during business hours." data-fr="Nous fournissons un support par email 24/7 pour tous les plans. Le support téléphonique est disponible pour les plans Professionnel et Entreprise pendant les heures de bureau.">We provide 24/7 email support for all plans. Phone support is available for Professional and Enterprise plans during business hours.</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 5 -->
+                    <div class="bg-white rounded-xl p-6 shadow animate__animated animate__fadeIn" style="animation-delay: 1s;">
+                        <button class="flex items-center justify-between w-full text-left focus:outline-none">
+                            <h3 class="text-lg font-semibold" data-en="Can I upgrade or downgrade my plan later?" data-fr="Puis-je changer de plan plus tard ?">Can I upgrade or downgrade my plan later?</h3>
+                            <i class="fas fa-chevron-down text-indigo-500 transition-transform duration-300"></i>
+                        </button>
+                        <div class="mt-4 hidden">
+                            <p class="text-gray-600" data-en="Yes, you can change your plan at any time. Your billing will be adjusted prorated based on your usage." data-fr="Oui, vous pouvez changer de plan à tout moment. Votre facturation sera ajustée au prorata de votre utilisation.">Yes, you can change your plan at any time. Your billing will be adjusted prorated based on your usage.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+                <!-- Column 1 -->
+                <div class="animate__animated animate__fadeIn" style="animation-delay: 0.2s;">
+                    <h3 class="text-lg font-semibold mb-4" data-en="Product" data-fr="Produit">Product</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition" data-en="Features" data-fr="Fonctionnalités">Features</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition" data-en="Pricing" data-fr="Tarifs">Pricing</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition" data-en="Download" data-fr="Télécharger">Download</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition" data-en="Updates" data-fr="Mises à jour">Updates</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 2 -->
+                <div class="animate__animated animate__fadeIn" style="animation-delay: 0.4s;">
+                    <h3 class="text-lg font-semibold mb-4" data-en="Resources" data-fr="Ressources">Resources</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition" data-en="Documentation" data-fr="Documentation">Documentation</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition" data-en="Tutorials" data-fr="Tutoriels">Tutorials</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition" data-en="Blog" data-fr="Blog">Blog</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition" data-en="API" data-fr="API">API</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 3 -->
+                <div class="animate__animated animate__fadeIn" style="animation-delay: 0.6s;">
+                    <h3 class="text-lg font-semibold mb-4" data-en="Company" data-fr="Entreprise">Company</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition" data-en="About Us" data-fr="À Propos">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition" data-en="Careers" data-fr="Carrières">Careers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition" data-en="Privacy" data-fr="Confidentialité">Privacy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition" data-en="Terms" data-fr="Conditions">Terms</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 4 -->
+                <div class="animate__animated animate__fadeIn" style="animation-delay: 0.8s;">
+                    <h3 class="text-lg font-semibold mb-4" data-en="Connect" data-fr="Connecter">Connect</h3>
+                    <div class="flex space-x-4 mb-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-instagram"></i></a>
+                    </div>
+                    <p class="text-gray-400" data-en="Subscribe to our newsletter" data-fr="Abonnez-vous à notre newsletter">Subscribe to our newsletter</p>
+                    <div class="mt-2 flex">
+                        <input type="email" placeholder="" class="px-4 py-2 rounded-l-lg text-gray-900 w-full focus:outline-none" data-en="Your email" data-fr="Votre email">
+                        <button class="bg-indigo-600 text-white px-4 py-2 rounded-r-lg hover:bg-indigo-700 transition" data-en="Subscribe" data-fr="S'abonner">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0 animate__animated animate__fadeIn">
+                    <i class="fas fa-boxes text-indigo-500 text-2xl mr-2"></i>
+                    <span class="text-xl font-bold">FlowStock</span>
+                </div>
+                <div class="text-gray-400 text-sm animate__animated animate__fadeIn" data-en="&copy; 2023 FlowStock. All rights reserved." data-fr="&copy; 2023 FlowStock. Tous droits réservés.">
+                    &copy; 2023 FlowStock. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Language toggle functionality
+        const languageToggle = document.getElementById('languageToggle');
+        languageToggle.addEventListener('change', function() {
+            const isFrench = this.checked;
+            document.querySelectorAll('[data-en], [data-fr]').forEach(element => {
+                if (isFrench) {
+                    if (element.getAttribute('data-fr')) {
+                        if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                            element.setAttribute('placeholder', element.getAttribute('data-fr'));
+                        } else {
+                            element.textContent = element.getAttribute('data-fr');
+                        }
+                    }
+                } else {
+                    if (element.getAttribute('data-en')) {
+                        if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                            element.setAttribute('placeholder', element.getAttribute('data-en'));
+                        } else {
+                            element.textContent = element.getAttribute('data-en');
+                        }
+                    }
+                }
+            });
+        });
+
+        // FAQ toggle functionality
+        document.querySelectorAll('.bg-white.rounded-xl.p-6.shadow button').forEach(button => {
+            button.addEventListener('click', () => {
+                const content = button.nextElementSibling;
+                const icon = button.querySelector('i');
+                
+                content.classList.toggle('hidden');
+                icon.classList.toggle('transform');
+                icon.classList.toggle('rotate-180');
+            });
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Animation on scroll
+        const animateOnScroll = function() {
+            const elements = document.querySelectorAll('.animate__animated');
+            
+            elements.forEach(element => {
+                const elementPosition = element.getBoundingClientRect().top;
+                const screenPosition = window.innerHeight / 1.3;
+                
+                if (elementPosition < screenPosition) {
+                    const animation = element.classList[1];
+                    element.classList.add(animation);
+                }
+            });
+        };
+
+        window.addEventListener('scroll', animateOnScroll);
+        window.addEventListener('load', animateOnScroll);
+    </script>
+</body>
+</html>

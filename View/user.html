@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Dashboard</title>
+</head>
+<body>
+  <h2>User Dashboard</h2>
+  <div id="content"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+const token = localStorage.getItem('jwtToken');
+
+axios.get('/api/user', {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+})
+.then(res => {
+  console.log(res.data); // show user dashboard content
+})
+.catch(err => {
+  console.error(err.response?.data || 'Access denied');
+});
+
+
+  </script>
+</body>
+</html>

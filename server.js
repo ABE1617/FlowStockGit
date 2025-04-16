@@ -37,9 +37,13 @@ app.get('/login', (req, res) => {
 app.get('/register', (req, res) => {
   res.sendFile(path.join(__dirname, 'View', 'register.html'));
 });
+app.get('/admin/notifications', (req, res) => {
+  res.sendFile(path.join(__dirname, 'View', 'notifications.html'));
+});
 
 // API Routes
 app.use('/api/auth', require('./routes/auth.routes'));
+app.use('/api/auth', require('./routes/notifications.routes'));
 app.use('/api', require('./routes/user.routes'));
 app.use('/api', require('./routes/admin.routes'));
 

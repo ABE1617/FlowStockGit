@@ -1,0 +1,67 @@
+<div class="card mt-4">
+    <div class="card-header">Send Notification</div>
+    <div class="card-body">
+      <form id="notificationForm">
+        <div class="mb-3">
+          <input type="text" class="form-control" name="title" placeholder="Title" required />
+        </div>
+        <div class="mb-3">
+          <textarea class="form-control" name="message" placeholder="Notification Message" required></textarea>
+        </div>
+        <div class="mb-3">
+          <select class="form-select" name="filter_type" required>
+            <option value="">Select target users</option>
+            <option value="disabled">Disabled Users</option>
+            <option value="active_with_valid_sub">Active Users with Valid Subscriptions</option>
+            <option value="active_with_expired_sub">Active Users with Expired or No Subscription</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Send</button>
+      </form>
+    </div>
+  </div>
+  
+  <div class="card mt-4">
+    <div class="card-header">Notification History</div>
+    <div class="card-body">
+      <ul id="notificationHistory" class="list-group"></ul>
+    </div>
+  </div>
+<script>
+const notifForm = document.getElementById('notificationForm');
+const notifHistoryList = document.getElementById('notificationHistory');
+
+notifForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(notifForm);
+  const data = Object.fromEntries(formData.entries());
+
+  try {
+    await axios.post('/api/admin/notifications/send', data, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    alert('Notification sent!');
+    notifForm.reset();
+    loadNotifHistory();
+  } catch (err) {
+    console.error(err);
+    alert('Failed to send notification');
+  }
+});
+
+async function loadNotifHistory() {
+  const res = await axios.get('/api/admin/notifications/history', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  notifHistoryList.innerHTML = res.data.map(n => `
+    <li class="list-group-item">
+      <strong>${n.title}</strong><br/>
+      <small>${new Date(n.createdAt).toLocaleString()} | Filter: ${n.filter_type} | Sent to: ${n.sent_to_count} users</small><br/>
+      ${n.message}
+    </li>
+  `).join('');
+}
+
+loadNotifHistory();
+</script>

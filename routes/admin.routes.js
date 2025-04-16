@@ -1,7 +1,13 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcrypt');
 const { authenticate, authorizeRoles } = require('../middleware/auth.middleware');
+const notificationController = require('../Controller/notificationController');
 const { User } = require('../Model');
+const fs = require('fs');
+const path = require('path');
+
+
 
 function calculateSubscriptionEnd(start, durationStr) {
   if (!start || !durationStr) return null;
@@ -18,6 +24,12 @@ function calculateSubscriptionEnd(start, durationStr) {
   return startDate;
 }
 
+
+//Generate random 8-character password
+const generateRandomPassword = () => {
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  return Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+};
 
 // Get all users
 router.get('/admin/users', authenticate, authorizeRoles('admin'), async (req, res) => {
@@ -72,32 +84,7 @@ router.delete('/admin/delete/:id', authenticate, authorizeRoles('admin'), async 
 });
 
 // Add a new user
-router.post('/admin/users', authenticate, authorizeRoles('admin'), async (req, res) => {
-    try {
-      const { first_name, last_name, email, password, birthday, store_name, role } = req.body;
-  
-      const { subscription_start, subscription_duration } = req.body;
-const subscription_end = calculateSubscriptionEnd(subscription_start, subscription_duration);
 
-const newUser = await User.create({
-  first_name,
-  last_name,
-  store_name,
-  email,
-  birthday,
-  role,
-  is_active: false, // Initially inactive
-  subscription_start,
-  subscription_end
-});
-
-  
-      res.status(201).json(newUser);
-    } catch (err) {
-      res.status(500).send("Failed to create user: " + err.message);
-    }
-  });
-  
   
 
   // Add subscription check to server startup
@@ -126,42 +113,85 @@ Object.assign(user, {
   });
   
 
+  // Final version: Create user + notify all admins
   router.post('/admin/user', authenticate, authorizeRoles('admin'), async (req, res) => {
-    const { first_name, last_name, store_name, email, birthday, role, is_active } = req.body;
-  
     try {
-      // Check if email exists
-      const existingUser = await User.findOne({ where: { email } });
-      if (existingUser) {
-        return res.status(409).json({ message: 'Email already exists' });
-      }
-  
-      // Create new user
-      const newUser = await User.create({
+      const {
         first_name,
         last_name,
         store_name,
         email,
         birthday,
         role,
-        is_active
+        is_active,
+        subscription_start,
+        subscription_duration
+      } = req.body;
+  
+      // ✅ Check if email exists
+      const existingUser = await User.findOne({ where: { email } });
+      if (existingUser) {
+        return res.status(409).json({ message: 'Email already exists' });
+      }
+  
+      // ✅ Generate and hash password
+      const plainPassword = generateRandomPassword();
+      const hashedPassword = await bcrypt.hash(plainPassword, 10);
+  
+      // ✅ Calculate subscription_end if needed
+      let subscription_end = null;
+      if (role === 'user' && subscription_start && subscription_duration) {
+        subscription_end = new Date(subscription_start);
+        subscription_end.setDate(subscription_end.getDate() + parseInt(subscription_duration));
+      }
+  
+      // ✅ Create the user
+      const newUser = await User.create({
+        first_name,
+        last_name,
+        store_name,
+        email,
+        password: hashedPassword,
+        birthday,
+        role,
+        is_active: !!is_active,
+        subscription_start: subscription_start || null,
+        subscription_duration: subscription_duration || null,
+        subscription_end
       });
+      res.status(201).json(newUser);
+      // ✅ Save credentials to file
+      const credentials = {
+        email: newUser.email,
+        password: plainPassword,
+        login_link: 'https://yourapp.com/login' // Replace with your real link
+      };
+      const filePath = path.join(__dirname, `../logins/${newUser.email.replace(/[^a-zA-Z0-9]/g, '_')}.json`);
+      fs.mkdirSync(path.dirname(filePath), { recursive: true }); // Ensure directory exists
+      fs.writeFileSync(filePath, JSON.stringify(credentials, null, 2));
   
-      // Notify all admins
-      const admins = await User.findAll({ where: { role: 'admin' } });
-      const emails = admins.map(admin => admin.email);
-      res.status(201).json({ message: 'User created' });
-  
+      // ✅ Send email to the new user
       await sendEmail(
-        emails,
-        'New FlowStock User Created',
-        `<p>A new user has been added: <strong>${newUser.first_name} ${newUser.last_name}</strong> (${newUser.email})</p>`
+        [newUser.email],
+        'Your FlowStock Account Details',
+        `<p>Hello ${newUser.first_name},</p>
+        <p>Your FlowStock account has been created. Here are your login details:</p>
+        <ul>
+          <li><strong>Email:</strong> ${newUser.email}</li>
+          <li><strong>Password:</strong> ${plainPassword}</li>
+          <li><strong>Login here:</strong> <a href="https://yourapp.com/login">FlowStock Login</a></li>
+        </ul>
+        <p>Please change your password after logging in.</p>`
       );
+  
+
     } catch (err) {
-      console.error('❌ Error creating user:', err.message);
-      return res.status(500).json({ message: 'Error creating user', error: err.message });
+      console.error(err);
+      res.status(500).json({ message: 'Error creating user' });
     }
   });
+
+
   
   
   
@@ -178,6 +208,6 @@ Object.assign(user, {
     }
   });
   
-  
+
 
 module.exports = router;

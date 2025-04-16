@@ -192,6 +192,10 @@
                 <input type="date" name="subscription_start" class="form-control">
               </div>
               <div class="col-md-6">
+                <label class="form-label">Subscription End</label>
+                <input type="text" name="subscription_end" class="form-control" placeholder="e.g. 10 days">
+              </div>
+              <div class="col-md-6">
                 <label class="form-label">Subscription Duration</label>
                 <input type="text" name="subscription_duration" class="form-control" placeholder="e.g. 10 days">
               </div>
@@ -310,6 +314,7 @@
     if (role === 'admin') {
       document.querySelector('[name="subscription_start"]').value = '';
       document.querySelector('[name="subscription_duration"]').value = '';
+      document.querySelector('[name="subscription_end"]').value = '';
     }
   }
 
@@ -324,6 +329,29 @@
       userForm.birthday.value = user.birthday;
       userForm.role.value = user.role;
       userForm.is_active.checked = user.is_active;
+
+      if (user.subscription_start) {
+        const startDate = new Date(user.subscription_start);
+        userForm.subscription_start.value = startDate.toISOString().split('T')[0];
+      } else {
+        userForm.subscription_start.value = '';
+      }
+
+      if (user.subscription_end) {
+        const endDate = new Date(user.subscription_end);
+        userForm.subscription_end.value = endDate.toISOString().split('T')[0];
+
+        if (user.subscription_start) {
+          const startDate = new Date(user.subscription_start);
+          const diffTime = endDate - startDate;
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          userForm.subscription_duration.value = diffDays;
+        }
+      } else {
+        userForm.subscription_end.value = '';
+        userForm.subscription_duration.value = '';
+      }
+
       toggleSubscriptionFields(user.role);
       userModal.show();
     }
@@ -334,6 +362,11 @@
     const formData = new FormData(userForm);
     const data = Object.fromEntries(formData.entries());
     data.is_active = formData.get('is_active') === 'on';
+
+    // Convert subscription_duration to integer
+    if (data.subscription_duration) {
+      data.subscription_duration = parseInt(data.subscription_duration);
+    }
 
     if (!data.id) delete data.id;
 
@@ -359,6 +392,41 @@
 
   searchInput.addEventListener('input', renderUsers);
   filterRole.addEventListener('change', renderUsers);
+
+  // === Real-time syncing between duration <-> end date ===
+  const startInput = document.querySelector('[name="subscription_start"]');
+  const endInput = document.querySelector('[name="subscription_end"]');
+  const durationInput = document.querySelector('[name="subscription_duration"]');
+
+  function updateDuration() {
+    if (startInput.value && endInput.value) {
+      const startDate = new Date(startInput.value);
+      const endDate = new Date(endInput.value);
+      const diffTime = endDate - startDate;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      durationInput.value = diffDays > 0 ? diffDays : 0;
+    }
+  }
+
+  function updateEndDate() {
+    if (startInput.value && durationInput.value) {
+      const startDate = new Date(startInput.value);
+      const daysToAdd = parseInt(durationInput.value);
+      if (!isNaN(daysToAdd)) {
+        const newEndDate = new Date(startDate);
+        newEndDate.setDate(startDate.getDate() + daysToAdd);
+        endInput.value = newEndDate.toISOString().split('T')[0];
+      }
+    }
+  }
+
+  startInput.addEventListener('change', () => {
+    updateDuration();
+    updateEndDate();
+  });
+
+  endInput.addEventListener('change', updateDuration);
+  durationInput.addEventListener('input', updateEndDate);
 
   loadUsers();
 </script>

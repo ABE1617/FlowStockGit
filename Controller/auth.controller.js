@@ -39,10 +39,11 @@ exports.login = async (req, res) => {
   try {
     const user = await User.findOne({ where: { email } });
     if (!user) return res.status(404).send("User not found");
-    if (!user.is_active) return res.status(403).send("Account not active");
-
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).send("Invalid password");
+    if (!user.is_active) return res.status(403).send("Account not active");
+
+
 
     const token = createToken(user);
     res.json({ token }); // Send token to frontend

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,81 +6,145 @@
   <title>FlowStock Admin Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
     body {
-      background-color: #f4f6f8;
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
-
     .sidebar {
-      width: 220px;
-      height: 100vh;
-      position: fixed;
-      top: 0;
-      left: 0;
-      background-color: #343a40;
-      padding-top: 20px;
+      background: #2c3e50;
+      min-height: 100vh;
+      padding: 20px 0;
+      color: white;
     }
-
-    .sidebar a {
+    .sidebar .nav-link {
+      color: rgba(255,255,255,.8);
       padding: 12px 20px;
-      display: block;
-      color: #ffffff;
-      text-decoration: none;
+      margin: 4px 16px;
+      border-radius: 8px;
+      transition: all 0.3s;
     }
-
-    .sidebar a:hover {
-      background-color: #495057;
+    .sidebar .nav-link:hover {
+      background: rgba(255,255,255,.1);
+      color: white;
     }
-
-    .dashboard {
-      margin-left: 240px;
-      padding: 40px 20px;
-      max-width: 1100px;
+    .dashboard-header {
+      background: white;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,.04);
     }
-
-    .table th,
-    .table td {
-      vertical-align: middle;
+    .card {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.05);
+      transition: transform 0.2s;
     }
-
-    .form-inline {
-      display: flex;
-      gap: 10px;
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .table {
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .table th {
+      background: #f8f9fa;
+      font-weight: 600;
+      border-bottom: none;
+    }
+    .btn-action {
+      padding: 4px 8px;
+      margin: 0 2px;
+    }
+    .form-control, .form-select {
+      border-radius: 8px;
+      padding: 10px 15px;
+    }
+    .modal-content {
+      border-radius: 15px;
+      border: none;
+    }
+    .modal-header {
+      background: #f8f9fa;
+      border-bottom: 1px solid #eee;
     }
   </style>
 </head>
 <body>
 
-<!-- Sidebar -->
-<div class="sidebar">
-  <a href="#">🏠 Home Page</a>
-  <a href="#">👥 Clients</a>
-  <a href="#">🚨 Alerts</a>
-</div>
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3 col-lg-2 sidebar">
+      <div class="d-flex align-items-center mb-4 px-4">
+        <i class="fas fa-box-open fa-2x me-2"></i>
+        <h4 class="mb-0">FlowStock</h4>
+      </div>
+      <nav class="nav flex-column">
+        <a class="nav-link active" href="#"><i class="fas fa-home me-2"></i> Dashboard</a>
+        <a class="nav-link" href="#"><i class="fas fa-users me-2"></i> Users</a>
+        <a class="nav-link" href="#"><i class="fas fa-cog me-2"></i> Settings</a>
+      </nav>
+    </div>
 
-<!-- Main Content -->
-<div class="container dashboard">
-  <h2 class="mb-4">FlowStock Admin Dashboard</h2>
+    <!-- Main Content -->
+    <div class="col-md-9 col-lg-10 ms-sm-auto px-4">
+      <div class="dashboard-header mb-4">
+        <div class="row align-items-center">
+          <div class="col">
+            <h4 class="mb-0">User Management</h4>
+          </div>
+          <div class="col-auto">
+            <button class="btn btn-primary" onclick="showUserForm()">
+              <i class="fas fa-plus me-2"></i>Add User
+            </button>
+          </div>
+        </div>
+      </div>
 
-  <div class="form-inline mb-3">
-    <input type="text" id="searchInput" class="form-control" placeholder="Search users...">
-    <select id="filterRole" class="form-select">
-      <option value="">All Roles</option>
-      <option value="admin">Admin</option>
-      <option value="user">User</option>
-    </select>
-    <button class="btn btn-success" onclick="showUserForm()">Add User</button>
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="input-group">
+                <span class="input-group-text bg-white border-end-0">
+                  <i class="fas fa-search text-muted"></i>
+                </span>
+                <input type="text" id="searchInput" class="form-control border-start-0" placeholder="Search users...">
+              </div>
+            </div>
+            <div class="col-md-3">
+              <select id="filterRole" class="form-select">
+                <option value="">All Roles</option>
+                <option value="admin">Admin</option>
+                <option value="user">User</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Store</th>
+              <th>Email</th>
+              <th>Birthday</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Subscription</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="userTableBody"></tbody>
+        </table>
+      </div>
+    </div>
   </div>
-
-  <table class="table table-hover table-bordered">
-    <thead class="table-dark">
-      <tr>
-        <th>ID</th><th>Name</th><th>Store</th><th>Email</th><th>Birthday</th>
-        <th>Role</th><th>Status</th><th>Actions</th>
-      </tr>
-    </thead>
-    <tbody id="userTableBody"></tbody>
-  </table>
 </div>
 
 <!-- User Form Modal -->
@@ -92,23 +157,51 @@
       </div>
       <div class="modal-body">
         <input type="hidden" name="id">
-        <input type="text" name="first_name" class="form-control mb-2" placeholder="First Name" required>
-        <input type="text" name="last_name" class="form-control mb-2" placeholder="Last Name" required>
-        <input type="text" name="store_name" class="form-control mb-2" placeholder="Store Name">
-        <input type="email" name="email" class="form-control mb-2" placeholder="Email" required>
-        <input type="date" name="birthday" class="form-control mb-2">
-        <select name="role" class="form-select mb-2">
-          <option value="user">User</option>
-          <option value="admin">Admin</option>
-        </select>
-        <input type="date" name="subscription_start" class="form-control mb-2" placeholder="Start Date">
-<input type="text" name="subscription_duration" class="form-control mb-2" placeholder="Duration (e.g., 10 days, 1 month)">
-
-        <label><input type="checkbox" name="is_active"> Active</label>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <input type="text" name="first_name" class="form-control" placeholder="First Name" required>
+          </div>
+          <div class="col-md-6">
+            <input type="text" name="last_name" class="form-control" placeholder="Last Name" required>
+          </div>
+          <div class="col-12">
+            <input type="text" name="store_name" class="form-control" placeholder="Store Name">
+          </div>
+          <div class="col-md-6">
+            <input type="email" name="email" class="form-control" placeholder="Email" required>
+          </div>
+          <div class="col-md-6">
+            <input type="date" name="birthday" class="form-control">
+          </div>
+          <div class="col-md-6">
+            <select name="role" class="form-select" onchange="toggleSubscriptionFields(this.value)">
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="is_active" id="isActive">
+              <label class="form-check-label" for="isActive">Active</label>
+            </div>
+          </div>
+          <div id="subscriptionFields" class="col-12">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Subscription Start</label>
+                <input type="date" name="subscription_start" class="form-control">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Subscription Duration</label>
+                <input type="text" name="subscription_duration" class="form-control" placeholder="e.g. 10 days">
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-primary" type="submit">Save</button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save</button>
       </div>
     </form>
   </div>
@@ -134,6 +227,15 @@
     renderUsers();
   }
 
+  function calculateRemainingDays(subscription_end) {
+    if (!subscription_end) return 'No subscription';
+    const end = new Date(subscription_end);
+    const now = new Date();
+    const diffTime = end - now;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 0 ? `${diffDays} days remaining` : 'Expired';
+  }
+
   function renderUsers() {
     tbody.innerHTML = '';
     const query = searchInput.value.toLowerCase();
@@ -146,18 +248,26 @@
         tr.innerHTML = `
           <td>${user.id}</td>
           <td>${user.first_name} ${user.last_name}</td>
-          <td>${user.store_name}</td>
+          <td>${user.store_name || '-'}</td>
           <td>${user.email}</td>
-          <td>${user.birthday}</td>
-          <td>${user.role}</td>
-          <td>${user.is_active ? 'Active' : 'Inactive'}</td>
+          <td>${user.birthday || '-'}</td>
+          <td><span class="badge bg-${user.role === 'admin' ? 'primary' : 'success'}">${user.role}</span></td>
+          <td><span class="badge bg-${user.is_active ? 'success' : 'danger'}">${user.is_active ? 'Active' : 'Inactive'}</span></td>
+          <td><span class="badge bg-info">${user.role === 'user' ? calculateRemainingDays(user.subscription_end) : 'N/A'}</span></td>
           <td>
-            <button class="btn btn-sm btn-info" onclick="editUser(${user.id})">Edit</button>
-            <button class="btn btn-sm btn-${user.is_active ? 'secondary' : 'success'}" onclick="toggleActivation(${user.id})">
-              ${user.is_active ? 'Deactivate' : 'Activate'}
+            <button class="btn btn-sm btn-outline-info btn-action" onclick="editUser(${user.id})" title="Edit">
+              <i class="fas fa-edit"></i>
             </button>
-            <button class="btn btn-sm btn-warning" onclick="toggleRole(${user.id}, '${user.role}')">Toggle Role</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteUser(${user.id})">Delete</button>
+            <button class="btn btn-sm btn-outline-${user.is_active ? 'secondary' : 'success'} btn-action" 
+                    onclick="toggleActivation(${user.id})" title="${user.is_active ? 'Deactivate' : 'Activate'}">
+              <i class="fas fa-power-off"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-warning btn-action" onclick="toggleRole(${user.id}, '${user.role}')" title="Toggle Role">
+              <i class="fas fa-user-cog"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger btn-action" onclick="deleteUser(${user.id})" title="Delete">
+              <i class="fas fa-trash"></i>
+            </button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -194,6 +304,15 @@
     userModal.show();
   }
 
+  function toggleSubscriptionFields(role) {
+    const subscriptionFields = document.getElementById('subscriptionFields');
+    subscriptionFields.style.display = role === 'user' ? 'block' : 'none';
+    if (role === 'admin') {
+      document.querySelector('[name="subscription_start"]').value = '';
+      document.querySelector('[name="subscription_duration"]').value = '';
+    }
+  }
+
   function editUser(id) {
     const user = users.find(u => u.id === id);
     if (user) {
@@ -205,6 +324,7 @@
       userForm.birthday.value = user.birthday;
       userForm.role.value = user.role;
       userForm.is_active.checked = user.is_active;
+      toggleSubscriptionFields(user.role);
       userModal.show();
     }
   }

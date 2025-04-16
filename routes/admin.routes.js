@@ -100,7 +100,11 @@ const newUser = await User.create({
   
   
 
-  router.put('/admin/users/:id', authenticate, authorizeRoles('admin'), async (req, res) => {
+  // Add subscription check to server startup
+const { checkAndUpdateSubscriptions } = require('../utils/subscription');
+setInterval(checkAndUpdateSubscriptions, 1000 * 60 * 60); // Check every hour
+
+router.put('/admin/users/:id', authenticate, authorizeRoles('admin'), async (req, res) => {
     try {
       const user = await User.findByPk(req.params.id);
       if (!user) return res.status(404).send("User not found");
@@ -146,14 +150,13 @@ Object.assign(user, {
       // Notify all admins
       const admins = await User.findAll({ where: { role: 'admin' } });
       const emails = admins.map(admin => admin.email);
+      res.status(201).json({ message: 'User created' });
   
       await sendEmail(
         emails,
         'New FlowStock User Created',
         `<p>A new user has been added: <strong>${newUser.first_name} ${newUser.last_name}</strong> (${newUser.email})</p>`
       );
-  
-      return res.status(201).json({ message: 'User created' });
     } catch (err) {
       console.error('❌ Error creating user:', err.message);
       return res.status(500).json({ message: 'Error creating user', error: err.message });
